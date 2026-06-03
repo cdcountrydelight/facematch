@@ -12,6 +12,11 @@ android {
     androidResources { noCompress += listOf("tflite") }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 dependencies {
     // Compose
@@ -41,4 +46,22 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.cdcountrydelight"
+                artifactId = "facematch"
+                version = System.getenv("VERSION") ?: "1.0.0"
+
+                pom {
+                    name.set("FaceMatch SDK")
+                    description.set("On-device face verification with liveness & anti-spoof detection")
+                }
+            }
+        }
+    }
 }
